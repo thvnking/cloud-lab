@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node server/server.js"
+    "start": "node server/server.js",
+    "check:lab3": "node scripts/check-lab3.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

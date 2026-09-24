@@ -9,14 +9,25 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const REQUIRED_ENV = ['MONGODB_URI'];
+for (const key of REQUIRED_ENV) {
+  if (!process.env[key]) {
+    console.error(`Missing required environment variable: ${key}`);
+  }
+}
+
 // Kết nối MongoDB Atlas
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log(">>> Da ket noi thanh cong voi MongoDB Atlas!"))
-  .catch(err => console.error("Loi ket noi MongoDB:", err));
+  .catch(err => console.error("Loi ket noi MongoDB:", err.message));
 
 // API Hello Test
 app.get('/api/hello', (req, res) => {
   res.json({ message: "Hello tu Linux Server Backend!" });
+});
+
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // GET /api/students - Lấy danh sách sinh viên
@@ -43,10 +54,15 @@ app.post('/api/students', async (req, res) => {
 app.put('/api/students/:id', async (req, res) => {
   try {
     const updatedStudent = await Student.findByIdAndUpdate(
-      req.params.id, 
-      req.body, 
+      req.params.id,
+      req.body,
       { new: true }
     );
+
+    if (!updatedStudent) {
+      return res.status(404).json({ error: 'Sinh vien khong ton tai' });
+    }
+
     res.json(updatedStudent);
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -56,8 +72,11 @@ app.put('/api/students/:id', async (req, res) => {
 // DELETE /api/students/:id - Xóa sinh viên
 app.delete('/api/students/:id', async (req, res) => {
   try {
-    await Student.findByIdAndDelete(req.params.id);
-    res.json({ message: "Da xoa sinh vien" });
+    const deleted = await Student.findByIdAndDelete(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ error: 'Sinh vien khong ton tai' });
+    }
+    res.json({ message: 'Da xoa sinh vien' });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
