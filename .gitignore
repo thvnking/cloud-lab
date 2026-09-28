@@ -1,0 +1,18 @@
+# Node
+node_modules/
+**/node_modules/
+
+# Environment variables
+.env
+**/.env
+.env.*
+**/.env.*
+
+# Build output
+build/
+dist/
+**/dist/
+
+# OS
+.DS_Store
+Thumbs.db
