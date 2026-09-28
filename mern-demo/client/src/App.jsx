@@ -4,6 +4,7 @@ function App() {
   const [students, setStudents] = useState([]);
   const [form, setForm] = useState({ studentId: '', name: '', email: '' });
   const [editingId, setEditingId] = useState(null);
+  const [message, setMessage] = useState('');
 
   const API_URL = 'http://localhost:5000/api/students';
 
@@ -23,24 +24,34 @@ function App() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editingId) {
-      // Cập nhật sinh viên (PUT)
-      await fetch(`${API_URL}/${editingId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
-      });
-      setEditingId(null);
-    } else {
-      // Thêm mới sinh viên (POST)
-      await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
-      });
+    try {
+      if (editingId) {
+        const res = await fetch(`${API_URL}/${editingId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(form)
+        });
+
+        if (!res.ok) throw new Error('Cap nhat sinh vien that bai');
+        setMessage('✅ Cập nhật sinh viên thành công!');
+        setEditingId(null);
+      } else {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(form)
+        });
+
+        if (!res.ok) throw new Error('Them sinh vien that bai');
+        setMessage('✅ Thêm sinh viên thành công!');
+      }
+
+      setForm({ studentId: '', name: '', email: '' });
+      fetchStudents();
+    } catch (error) {
+      setMessage('❌ Có lỗi xảy ra khi lưu sinh viên.');
+      console.error(error);
     }
-    setForm({ studentId: '', name: '', email: '' });
-    fetchStudents();
   };
 
   const handleEdit = (student) => {
@@ -53,13 +64,33 @@ function App() {
   };
 
   const handleDelete = async (id) => {
-    await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-    fetchStudents();
+    try {
+      const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Xoa sinh vien that bai');
+      setMessage('✅ Xóa sinh viên thành công!');
+      fetchStudents();
+    } catch (error) {
+      setMessage('❌ Có lỗi xảy ra khi xóa sinh viên.');
+      console.error(error);
+    }
   };
 
   return (
     <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
       <h2>Quan Ly Sinh Vien</h2>
+
+      {message && (
+        <div style={{
+          marginBottom: '12px',
+          padding: '10px 12px',
+          borderRadius: '6px',
+          backgroundColor: '#e8f5e9',
+          color: '#1b5e20',
+          border: '1px solid #a5d6a7'
+        }}>
+          {message}
+        </div>
+      )}
       
       <form onSubmit={handleSubmit} style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
         <input 
