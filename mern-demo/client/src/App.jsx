@@ -77,7 +77,7 @@ function App() {
 
   return (
     <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
-      <h2>Quan Ly Sinh Vien</h2>
+      <h2>Quan Ly Sinh Vien - Version 2.0</h2>
 
       {message && (
         <div style={{

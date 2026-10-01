@@ -1,19 +1,16 @@
+version: '3.8'
+
 services:
   backend:
-    image: thvnkinger/mern-backend:latest
-    container_name: mern-backend
+    image: thvnkinger/mern-backend:1.0
     ports:
       - "5000:5000"
     environment:
-      PORT: "5000"
-      MONGODB_URI: mongodb+srv://cloud_user1:cloud_user1@cluster0.udo3k0s.mongodb.net/mongo-server?retryWrites=true&w=majority&appName=Cluster0
-    restart: unless-stopped
+      - MONGODB_URI=mmongodb+srv://cloud_user1:cloud_user1@cluster0.udo3k0s.mongodb.net/mongo-server?retryWrites=true&w=majority&appName=Cluster0
 
   frontend:
-    image: thvnkinger/mern-frontend:latest
-    container_name: mern-frontend
+    image: thvnkinger/mern-frontend:2cd .0
     ports:
       - "3000:3000"
     depends_on:
       - backend
-    restart: unless-stopped
