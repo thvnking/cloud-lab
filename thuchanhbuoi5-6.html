@@ -1,0 +1,540 @@
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+<meta charset='utf-8'>
+<title>Thực Hành Buổi 5 - 6: MERN Stack Cloud PaaS</title>
+<style>
+    body {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 12pt;
+        line-height: 1.5;
+        color: #000000;
+        margin: 1in;
+    }
+    h1 {
+        font-size: 18pt;
+        font-weight: bold;
+        color: #1a365d;
+        text-align: center;
+        margin-top: 18pt;
+        margin-bottom: 12pt;
+        text-transform: uppercase;
+    }
+    h2 {
+        font-size: 14pt;
+        font-weight: bold;
+        color: #2b6cb0;
+        margin-top: 14pt;
+        margin-bottom: 6pt;
+        border-bottom: 1px solid #cbd5e0;
+        padding-bottom: 4pt;
+    }
+    h3 {
+        font-size: 12pt;
+        font-weight: bold;
+        color: #2d3748;
+        margin-top: 12pt;
+        margin-bottom: 4pt;
+    }
+    p {
+        margin-top: 0;
+        margin-bottom: 6pt;
+        text-align: justify;
+    }
+    ul, ol {
+        margin-top: 0;
+        margin-bottom: 6pt;
+        padding-left: 20pt;
+    }
+    li {
+        margin-bottom: 3pt;
+        text-align: justify;
+    }
+    code, pre {
+        font-family: 'Consolas', 'Courier New', Courier, monospace;
+        font-size: 10pt;
+        background-color: #f7fafc;
+    }
+    pre {
+        border: 1px solid #e2e8f0;
+        padding: 8pt;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        margin-top: 6pt;
+        margin-bottom: 6pt;
+    }
+    .diagram {
+        font-family: 'Consolas', 'Courier New', Courier, monospace;
+        font-size: 9.5pt;
+        background-color: #f7fafc;
+        border: 1px solid #cbd5e0;
+        padding: 10pt;
+        margin: 10pt 0;
+        line-height: 1.2;
+    }
+    .info-box {
+        background-color: #ebf8ff;
+        border-left: 4px solid #3182ce;
+        padding: 8pt 12pt;
+        margin: 10pt 0;
+    }
+    hr {
+        border: 0;
+        border-top: 1px solid #e2e8f0;
+        margin: 18pt 0;
+    }
+</style>
+</head>
+<body>
+
+<h1>BUỔI 5. TRIỂN KHAI ỨNG DỤNG MERN MULTI-CONTAINER LÊN CLOUD PAAS (RENDER.COM)</h1>
+
+<div class="info-box">
+    <p><b>Thời lượng:</b> 300 phút (5 giờ)</p>
+    <p><b>Môi trường:</b> Máy tính cá nhân, VS Code, Trình duyệt Web, Render.com Dashboard</p>
+    <p><b>Ứng dụng:</b> Tiếp tục ứng dụng Quản lý sinh viên của Buổi 4</p>
+    <p><b>Database:</b> MongoDB Atlas Free Tier</p>
+    <p><b>Công nghệ:</b> Docker, Docker Hub, Cloud PaaS (Render.com), Environment Variables, CORS, Node.js/Express, React, Git/GitHub</p>
+</div>
+
+<h2>Mục tiêu</h2>
+<p>Sau khi hoàn thành buổi thực hành, sinh viên có khả năng:</p>
+<ol>
+    <li>Hiểu khái niệm và ưu điểm của mô hình Cloud PaaS (Platform as a Service) so với IaaS (AWS EC2).</li>
+    <li>Tạo và quản lý tài khoản Cloud PaaS miễn phí trên Render.com không cần thẻ tín dụng.</li>
+    <li>Liên kết Render.com với Docker Hub Registry để triển khai Web Service từ Docker Image.</li>
+    <li>Triển khai Express Backend Container từ Docker Hub lên Render.</li>
+    <li>Cấu hình các Biến môi trường (Environment Variables) an toàn trên Cloud cho Backend.</li>
+    <li>Kết nối thành công Backend Container trên Render với Cloud Database MongoDB Atlas.</li>
+    <li>Triển khai React Frontend Container từ Docker Hub lên Render.</li>
+    <li>Cấu hình biến môi trường Frontend để kết nối tới URL Backend API trên Cloud.</li>
+    <li>Chẩn đoán và xử lý triệt để lỗi CORS (Cross-Origin Resource Sharing) giữa Frontend và Backend trên môi trường Production.</li>
+    <li>Thực hiện đầy đủ các thao tác CRUD sinh viên trên ứng dụng MERN triển khai thực tế trên Cloud.</li>
+    <li>Hiểu cơ chế "Cold Start" và cách đọc System/Runtime Logs trên Cloud PaaS.</li>
+    <li>Quản lý source code và lưu trữ cấu hình triển khai an toàn trên GitHub.</li>
+</ol>
+
+<h2>Kết quả cần đạt</h2>
+<p>Cuối buổi, sinh viên xây dựng và triển khai thành công ứng dụng MERN trên Cloud PaaS theo mô hình:</p>
+
+<div class="diagram">
+Trình duyệt Người dùng (Client Browser)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├───► Render Frontend Service (React Container)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│ (HTTPS REST API Call)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└───► Render Backend Service (Node.js/Express Container)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│ (MongoDB Wire Protocol)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MongoDB Atlas (Cloud Database)
+</div>
+
+<p>Đồng thời, quản lý thành công các liên kết triển khai:</p>
+<ul>
+    <li><b>GitHub Repository:</b> <code>https://github.com/&lt;github-username&gt;/cloud-lab</code></li>
+    <li><b>Docker Hub Repositories:</b> <code>&lt;dockerhub-username&gt;/mern-backend:1.0</code> và <code>&lt;dockerhub-username&gt;/mern-frontend:2.0</code></li>
+    <li><b>Render Backend Web Service:</b> <code>https://mern-backend-&lt;student-id&gt;.onrender.com</code></li>
+    <li><b>Render Frontend Web Service:</b> <code>https://mern-frontend-&lt;student-id&gt;.onrender.com</code></li>
+</ul>
+
+<h2>PHẦN 1. KHỞI TẠO TÀI KHOẢN CLOUD PAAS RENDER.COM VÀ KẾT NỐI DOCKER HUB</h2>
+<p><b>Thời gian dự kiến: 30 phút</b></p>
+<p><b>Câu 1.</b> Mở trình duyệt web và truy cập vào trang chủ của dịch vụ Cloud PaaS Render. <i>(Gợi ý: Truy cập <code>https://render.com</code>)</i></p>
+<p><b>Câu 2.</b> Đăng ký tài khoản Render mới bằng cách liên kết trực tiếp với tài khoản GitHub cá nhân đã dùng từ Buổi 1. <i>(Gợi ý: Chọn <b>GET STARTED FOR FREE</b> → <b>Sign in with GitHub</b>)</i></p>
+<p><b>Câu 3.</b> Xác nhận ủy quyền quyền truy cập (Authorize Render) cho tài khoản GitHub và hoàn tất thông tin đăng ký. <i>(Gợi ý: Kiểm tra hộp thư Email để xác nhận tài khoản nếu có yêu cầu)</i></p>
+<p><b>Câu 4.</b> Mở Bảng điều khiển quản trị (Render Dashboard) và quan sát giao diện làm việc chính. <i>(Gợi ý: Quan sát mục <b>Web Services</b>, <b>Static Sites</b>, <b>PostgreSQL</b>, <b>Redis</b>)</i></p>
+<p><b>Câu 5.</b> Mở tab mới trên trình duyệt và đăng nhập vào tài khoản Docker Hub đã tạo ở Buổi 4. <i>(Gợi ý: Truy cập <code>https://hub.docker.com</code>)</i></p>
+<p><b>Câu 6.</b> Kiểm tra 2 Repository Docker Image đã lưu trên Docker Hub từ Buổi 4. <i>(Gợi ý: Xác nhận có <code>&lt;dockerhub-username&gt;/mern-backend</code> và <code>&lt;dockerhub-username&gt;/mern-frontend</code>)</i></p>
+<p><b>Câu 7.</b> Kiểm tra trạng thái của các Repository trên Docker Hub để đảm bảo đang ở chế độ <b>Public</b>. <i>(Gợi ý: Kiểm tra nhãn Public kế bên tên Repository)</i></p>
+<p><b>Câu 8.</b> Kiểm tra các Thẻ phiên bản (Tags) hiện có của Image <code>mern-backend</code>. <i>(Gợi ý: Mở tab <b>Tags</b> trong Repository <code>mern-backend</code>, xác nhận có tag <code>1.0</code>)</i></p>
+<p><b>Câu 9.</b> Kiểm tra các Thẻ phiên bản (Tags) hiện có của Image <code>mern-frontend</code>. <i>(Gợi ý: Mở tab <b>Tags</b> trong Repository <code>mern-frontend</code>, xác nhận có tag <code>1.0</code> và <code>2.0</code>)</i></p>
+<p><b>Câu 10.</b> Lấy đường link công khai của 2 Docker Hub Repository để chuẩn bị cấu hình trên Render. <i>(Gợi ý: Đường link dạng <code>https://hub.docker.com/r/&lt;username&gt;/mern-backend</code>)</i></p>
+<p><b>Mục tiêu phần này:</b> Sinh viên thiết lập thành công tài khoản Cloud PaaS Render.com hoàn toàn miễn phí và sẵn sàng kết nối với các Docker Image lưu trên Docker Hub Registry.</p>
+
+<h2>PHẦN 2. TRIỂN KHAI BACKEND CONTAINER TỪ DOCKER HUB LÊN RENDER</h2>
+<p><b>Thời gian dự kiến: 60 phút</b></p>
+<p><b>Câu 11.</b> Tại Render Dashboard, tiến hành tạo một dịch vụ web mới. <i>(Gợi ý: Chọn button <b>New +</b> ở góc trên phải → Chọn <b>Web Service</b>)</i></p>
+<p><b>Câu 12.</b> Chọn phương thức triển khai bằng Docker Image có sẵn thay vì build từ GitHub Source Code. <i>(Gợi ý: Chọn tùy chọn <b>Deploy an existing image from a registry</b>)</i></p>
+<p><b>Câu 13.</b> Nhập đường dẫn Docker Image Backend từ Docker Hub vào ô <b>Image URL</b>. <i>(Gợi ý: Nhập <code>docker.io/&lt;dockerhub-username&gt;/mern-backend:1.0</code> hoặc <code>&lt;dockerhub-username&gt;/mern-backend:1.0</code>)</i></p>
+<p><b>Câu 14.</b> Nhấn <b>Next</b> để chuyển sang trang cấu hình chi tiết cho Web Service Backend. <i>(Gợi ý: Render sẽ kiểm tra tính tồn tại của Docker Image trên Docker Hub)</i></p>
+<p><b>Câu 15.</b> Đặt tên cho Web Service Backend. <i>(Gợi ý: Đặt tên theo cú pháp <code>mern-backend-&lt;mssv&gt;</code> để tránh trùng lặp tên miền)</i></p>
+<p><b>Câu 16.</b> Chọn Vùng địa lý (Region) cho máy chủ triển khai. <i>(Gợi ý: Chọn <b>Singapore (Southeast Asia)</b> hoặc <b>Oregon (US West)</b> để tối ưu tốc độ)</i></p>
+<p><b>Câu 17.</b> Chọn Nhánh/Môi trường thực thi (Instance Type). <i>(Gợi ý: Chọn gói <b>Free</b> - $0/month với 0.1 CPU, 512 MB RAM)</i></p>
+<p><b>Câu 18.</b> Cấu hình Port nội bộ mà Container Backend đang lắng nghe. <i>(Gợi ý: Tại mục <b>Advanced</b> → Tìm <b>Internal Port</b>, nhập <code>5000</code>)</i></p>
+<p><b>Câu 19.</b> Bỏ qua các bước build lệnh rườm rà vì Image đã được đóng gói hoàn chỉnh từ Dockerfile ở Buổi 3 & 4. <i>(Gợi ý: Render tự động nhận diện chỉ thị <code>CMD</code> trong Docker Image)</i></p>
+<p><b>Câu 20.</b> Nhấn <b>Create Web Service</b> để bắt đầu quá trình khởi tạo và kéo (pull) Docker Image từ Docker Hub về Cloud PaaS. <i>(Gợi ý: Quan sát màn hình Log tiến trình triển khai)</i></p>
+<p><b>Câu 21.</b> Mở tab <b>Logs</b> trên Render Dashboard để theo dõi toàn bộ nhật ký khởi chạy của Backend Container. <i>(Gợi ý: Tìm các dòng log <code>Pulling image...</code>, <code>Extracting...</code>, <code>Server running on port 5000</code>)</i></p>
+<p><b>Câu 22.</b> Xác định đường link công khai (Public URL) do Render tự động cấp cho Backend Service. <i>(Gợi ý: Quan sát đường link ngay bên dưới tên Service, dạng <code>https://mern-backend-&lt;mssv&gt;.onrender.com</code>)</i></p>
+<p><b>Câu 23.</b> Sao chép Public URL của Backend và mở trên tab mới của trình duyệt. <i>(Gợi ý: Truy cập <code>https://mern-backend-&lt;mssv&gt;.onrender.com/api/hello</code>)</i></p>
+<p><b>Câu 24.</b> Kiểm tra phản hồi từ API <code>/api/hello</code>. <i>(Gợi ý: Xác nhận trình duyệt trả về JSON xác nhận Backend đang chạy)</i></p>
+<p><b>Câu 25.</b> Truy cập endpoint <code>/api/students</code> trên trình duyệt để kiểm tra thử. <i>(Gợi ý: Truy cập <code>https://mern-backend-&lt;mssv&gt;.onrender.com/api/students</code>, quan sát log xem kết nối Database đã hoạt động chưa)</i></p>
+<p><b>Mục tiêu phần này:</b> Sinh viên triển khai thành công Web Service Backend chạy từ Docker Hub Image lên hạ tầng Cloud PaaS và lấy được Public URL HTTPS.</p>
+
+<h2>PHẦN 3. CẤU HÌNH BIẾN MÔI TRƯỜNG VÀ KẾT NỐI MONGODB ATLAS TRÊN CLOUD</h2>
+<p><b>Thời gian dự kiến: 45 phút</b></p>
+<p><b>Câu 26.</b> Mở lại trang quản trị MongoDB Atlas đã tạo ở Buổi 2 trên trình duyệt. <i>(Gợi ý: Truy cập <code>https://cloud.mongodb.com</code>)</i></p>
+<p><b>Câu 27.</b> Kiểm tra danh sách IP được phép truy cập (Network Access) trong MongoDB Atlas. <i>(Gợi ý: Chọn <b>Security</b> → <b>Network Access</b>)</i></p>
+<p><b>Câu 28.</b> Đảm bảo MongoDB Atlas đã mở quyền truy cập từ mọi địa chỉ IP (<code>0.0.0.0/0</code>) để cho phép máy chủ Cloud PaaS kết nối vào. <i>(Gợi ý: Chọn <b>Add IP Address</b> → <b>Allow Access from Anywhere</b>)</i></p>
+<p><b>Câu 29.</b> Lấy lại chuỗi kết nối MongoDB Connection String dành cho Node.js driver. <i>(Gợi ý: Chọn <b>Database</b> → <b>Connect</b> → <b>Drivers</b> → Sao chép chuỗi <code>mongodb+srv://...</code>)</i></p>
+<p><b>Câu 30.</b> Quay lại Render Dashboard, truy cập vào Web Service Backend <code>mern-backend-&lt;mssv&gt;</code>. <i>(Gợi ý: Chọn mục <b>Environment</b> ở menu bên trái)</i></p>
+<p><b>Câu 31.</b> Tạo biến môi trường mới tên <code>MONGODB_URI</code>. <i>(Gợi ý: Chọn <b>Add Environment Variable</b> → Key: <code>MONGODB_URI</code>)</i></p>
+<p><b>Câu 32.</b> Dán chuỗi MongoDB Connection String đã thay thế mật khẩu thật vào ô Value của <code>MONGODB_URI</code>. <i>(Gợi ý: Đảm bảo điền đúng username, password và tên database <code>cloud_lab</code>)</i></p>
+<p><b>Câu 33.</b> Tạo thêm biến môi trường <code>PORT</code> với giá trị <code>5000</code>. <i>(Gợi ý: Key: <code>PORT</code>, Value: <code>5000</code>)</i></p>
+<p><b>Câu 34.</b> Tạo biến môi trường <code>NODE_ENV</code> với giá trị <code>production</code>. <i>(Gợi ý: Key: <code>NODE_ENV</code>, Value: <code>production</code>)</i></p>
+<p><b>Câu 35.</b> Nhấn <b>Save Changes</b> để Render lưu các biến môi trường và tự động khởi động lại (Redeploy) Backend Container. <i>(Gợi ý: Quan sát dòng thông báo <code>Environment updated. Redeploying...</code>)</i></p>
+<p><b>Câu 36.</b> Mở tab <b>Logs</b> của Backend Service trên Render và theo dõi tiến trình khởi động lại. <i>(Gợi ý: Tìm dòng log xác nhận thành công <code>Connected to MongoDB Atlas successfully</code>)</i></p>
+<p><b>Câu 37.</b> Mở lại đường link <code>https://mern-backend-&lt;mssv&gt;.onrender.com/api/students</code> trên trình duyệt. <i>(Gợi ý: Kiểm tra xem API đã trả về mảng danh sách sinh viên JSON từ MongoDB Atlas chưa)</i></p>
+<p><b>Câu 38.</b> Sử dụng công cụ cURL hoặc Postman kiểm tra gửi một Request GET tới API Backend trên Cloud. <i>(Gợi ý lệnh: <code>curl https://mern-backend-&lt;mssv&gt;.onrender.com/api/students</code>)</i></p>
+<p><b>Mục tiêu phần này:</b> Sinh viên bảo mật thông tin kết nối bằng cách truyền biến môi trường trên Cloud PaaS Dashboard và kết nối thành công Backend Container với MongoDB Atlas.</p>
+
+<h2>PHẦN 4. TRIỂN KHAI FRONTEND CONTAINER VÀ CẤU HÌNH API ENDPOINT</h2>
+<p><b>Thời gian dự kiến: 60 phút</b></p>
+<p><b>Câu 39.</b> Tại Render Dashboard, nhấn <b>New +</b> → Chọn <b>Web Service</b> để tiến hành triển khai Frontend Service. <i>(Gợi ý: Chọn <b>Deploy an existing image from a registry</b>)</i></p>
+<p><b>Câu 40.</b> Nhập URL Docker Image Frontend phiên bản 2.0 đã đóng gói ở Buổi 4 vào ô <b>Image URL</b>. <i>(Gợi ý: Nhập <code>&lt;dockerhub-username&gt;/mern-frontend:2.0</code>)</i></p>
+<p><b>Câu 41.</b> Nhấn <b>Next</b> để đi đến trang cấu hình cho Frontend Service. <i>(Gợi ý: Render sẽ kiểm tra và xác nhận Image tồn tại trên Docker Hub)</i></p>
+<p><b>Câu 42.</b> Đặt tên cho Web Service Frontend. <i>(Gợi ý: Đặt tên <code>mern-frontend-&lt;mssv&gt;</code>)</i></p>
+<p><b>Câu 43.</b> Chọn Region cùng vùng với Backend Service (Singapore hoặc Oregon). <i>(Gợi ý: Chọn cùng Region để tối ưu độ trễ)</i></p>
+<p><b>Câu 44.</b> Chọn gói tài nguyên <b>Free</b> ($0/month). <i>(Gợi ý: Chọn gói Free Tier tương tự Backend)</i></p>
+<p><b>Câu 45.</b> Cấu hình Internal Port cho Frontend Container. <i>(Gợi ý: Tại mục <b>Advanced</b> → <b>Internal Port</b>, nhập <code>4173</code> hoặc <code>80</code> tùy theo port Nginx/Vite preview trong Dockerfile Frontend)</i></p>
+<p><b>Câu 46.</b> Nhấn <b>Create Web Service</b> và mở tab <b>Logs</b> để theo dõi quá trình kéo Image và khởi chạy Frontend Container. <i>(Gợi ý: Đợi đến khi log hiển thị <code>Your service is live</code>)</i></p>
+<p><b>Câu 47.</b> Lấy Public URL của Frontend Service do Render cấp. <i>(Gợi ý: Đường link dạng <code>https://mern-frontend-&lt;mssv&gt;.onrender.com</code>)</i></p>
+<p><b>Câu 48.</b> Mở Public URL Frontend trên trình duyệt để kiểm tra giao diện ứng dụng Quản lý sinh viên. <i>(Gợi ý: Quan sát xem giao diện React có tải thành công không)</i></p>
+<p><b>Câu 49.</b> Nhấn phím <b>F12</b> trên trình duyệt để mở Developer Tools → Chọn tab <b>Console</b> và <b>Network</b>. <i>(Gợi ý: Quan sát xem có các dòng thông báo lỗi màu đỏ hay không)</i></p>
+<p><b>Câu 50.</b> Nhận diện nguyên nhân màn hình chưa hiển thị dữ liệu sinh viên. <i>(Gợi ý: Do Frontend ở local đang gọi tới <code>localhost:5000</code> hoặc chưa biết URL Backend trên Render)</i></p>
+<p><b>Câu 51.</b> Truy cập vào mục <b>Environment</b> của Frontend Service <code>mern-frontend-&lt;mssv&gt;</code> trên Render Dashboard. <i>(Gợi ý: Chọn <b>Add Environment Variable</b>)</i></p>
+<p><b>Câu 52.</b> Khai báo biến môi trường <code>VITE_API_URL</code> với giá trị là Public URL của Backend Service đã lấy ở Phần 2. <i>(Gợi ý: Key: <code>VITE_API_URL</code>, Value: <code>https://mern-backend-&lt;mssv&gt;.onrender.com</code> - lưu ý không có dấu <code>/</code> ở cuối)</i></p>
+<p><b>Câu 53.</b> Nhấn <b>Save Changes</b> để Render lưu cấu hình và redeploy lại Frontend Container. <i>(Gợi ý: Theo dõi log để đảm bảo Frontend khởi chạy lại thành công)</i></p>
+<p><b>Mục tiêu phần này:</b> Sinh viên triển khai thành công React Frontend lên Cloud PaaS và cấu hình biến môi trường kết nối đến Backend API trên Cloud.</p>
+
+<h2>PHẦN 5. THỰC HÀNH XỬ LÝ LỖI CORS VÀ QUẢN LÝ BẢO MẬT PRODUCTION</h2>
+<p><b>Thời gian dự kiến: 45 phút</b></p>
+<p><b>Câu 54.</b> Mở lại ứng dụng Frontend trên trình duyệt (<code>https://mern-frontend-&lt;mssv&gt;.onrender.com</code>) và mở Developer Tools (F12) → Tab <b>Console</b>. <i>(Gợi ý: Quan sát dòng lỗi: <code>Access to fetch at 'https://mern-backend...' from origin 'https://mern-frontend...' has been blocked by CORS policy</code>)</i></p>
+<p><b>Câu 55.</b> Phân tích bản chất kỹ thuật của lỗi CORS (Cross-Origin Resource Sharing). <i>(Gợi ý: Do trình duyệt chặn các request AJAX/Fetch giữa 2 domain khác nhau khi Backend chưa khai báo cho phép Domain Frontend)</i></p>
+<p><b>Câu 56.</b> Mở VS Code trên máy tính cá nhân và truy cập vào source code dự án <code>cloud-lab</code> (đã clone từ Buổi 3). <i>(Gợi ý: Mở file <code>server/server.js</code>)</i></p>
+<p><b>Câu 57.</b> Kiểm tra đoạn mã cấu hình Middleware <code>cors()</code> trong file <code>server/server.js</code>. <i>(Gợi ý: Quan sát cách khai báo package <code>cors</code>)</i></p>
+<p><b>Câu 58.</b> Cập nhật file <code>server/server.js</code> để đọc linh hoạt Domain Frontend được phép từ biến môi trường <code>CLIENT_URL</code> hoặc cho phép cấu hình động. <i>(Gợi ý chỉnh sửa code trong <code>server/server.js</code>:)</i></p>
+
+<pre>const express = require('express');
+const cors = require('cors');
+require('dotenv').config();
+
+const app = express();
+
+// Cấu hình CORS linh hoạt cho Production
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  'http://localhost:5173',
+  'http://localhost:3000'
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
+      callback(null, true);
+    } else {
+      callback(null, true); // Hoặc truyền origin cụ thể
+    }
+  },
+  credentials: true
+}));
+
+app.use(express.json());</pre>
+
+<p><b>Câu 59.</b> Lưu thay đổi file <code>server/server.js</code> và di chuyển vào thư mục <code>server</code> trên Terminal local để build lại Docker Image Backend phiên bản <code>1.1</code>. <i>(Gợi ý lệnh: <code>docker build -t &lt;dockerhub-username&gt;/mern-backend:1.1 ./server</code>)</i></p>
+<p><b>Câu 60.</b> Đăng nhập Docker Hub từ Terminal local nếu cần. <i>(Gợi ý lệnh: <code>docker login</code>)</i></p>
+<p><b>Câu 61.</b> Push Docker Image Backend phiên bản <code>1.1</code> mới nâng cấp lên Docker Hub. <i>(Gợi ý lệnh: <code>docker push &lt;dockerhub-username&gt;/mern-backend:1.1</code>)</i></p>
+<p><b>Câu 62.</b> Quay lại Render Dashboard → Truy cập Web Service Backend <code>mern-backend-&lt;mssv&gt;</code>. <i>(Gợi ý: Chọn <b>Settings</b> → <b>Image URL</b> → Đổi tag sang <code>&lt;dockerhub-username&gt;/mern-backend:1.1</code> → Chọn <b>Save Changes</b>)</i></p>
+<p><b>Câu 63.</b> Truy cập mục <b>Environment</b> của Backend Service và thêm biến môi trường <code>CLIENT_URL</code>. <i>(Gợi ý: Key: <code>CLIENT_URL</code>, Value: <code>https://mern-frontend-&lt;mssv&gt;.onrender.com</code>)</i></p>
+<p><b>Câu 64.</b> Nhấn <b>Manual Deploy</b> → Chọn <b>Deploy latest image</b> để Render cập nhật Backend Container phiên bản <code>1.1</code>. <i>(Gợi ý: Theo dõi log để đảm bảo container mới chạy ổn định)</i></p>
+<p><b>Câu 65.</b> Tải lại trang web Frontend (<code>https://mern-frontend-&lt;mssv&gt;.onrender.com</code>) trên trình duyệt và kiểm tra tab Console. <i>(Gợi ý: Xác nhận dòng lỗi CORS màu đỏ đã hoàn toàn biến mất)</i></p>
+<p><b>Câu 66.</b> Kiểm tra danh sách sinh viên đã được React Frontend gọi API và hiển thị thành công lên màn hình. <i>(Gợi ý: Xác nhận luồng dữ liệu React Frontend → Express Backend → MongoDB Atlas)</i></p>
+<p><b>Mục tiêu phần này:</b> Sinh viên hiểu rõ nguyên nhân, cơ chế bảo mật và khắc phục triệt để lỗi CORS giữa các dịch vụ trên môi trường Production Cloud PaaS.</p>
+
+<h2>PHẦN 6. KIỂM THỬ TỔNG HỢP VÀ THAO TÁC CRUD TRÊN CLOUD PRODUCTION</h2>
+<p><b>Thời gian dự kiến: 40 phút</b></p>
+<p><b>Câu 67.</b> Mở ứng dụng Web chính thức trên Cloud tại đường link <code>https://mern-frontend-&lt;mssv&gt;.onrender.com</code>. <i>(Gợi ý: Đảm bảo giao diện tải mượt mà)</i></p>
+<p><b>Câu 68.</b> Kiểm tra chức năng <b>Xem danh sách sinh viên (Read)</b>. <i>(Gợi ý: Xác nhận danh sách hiển thị đúng các cột MSSV, Họ tên, Email)</i></p>
+<p><b>Câu 69.</b> Thực hiện chức năng <b>Thêm sinh viên mới (Create)</b> từ Form trên giao diện React. <i>(Gợi ý: Nhập MSSV: <code>SV001</code>, Họ tên: <code>Nguyen Van A</code>, Email: <code>anguyen@gmail.com</code> → Nhấn <b>Thêm sinh viên</b>)</i></p>
+<p><b>Câu 70.</b> Kiểm tra phản hồi trên giao diện ngay sau khi thêm. <i>(Gợi ý: Danh sách sinh viên tự động cập nhật thêm dòng mới mà không cần F5)</i></p>
+<p><b>Câu 71.</b> Mở MongoDB Atlas Dashboard trên tab khác → Vào <b>Database</b> → <b>Browse Collections</b> → Chọn collection <code>students</code>. <i>(Gợi ý: Xác nhận Document của sinh viên <code>SV001</code> đã xuất hiện trong CSDL Cloud)</i></p>
+<p><b>Câu 72.</b> Thực hiện thêm tiếp 2 sinh viên mới từ giao diện Web. <i>(Gợi ý: Thêm <code>SV002</code> và <code>SV003</code>)</i></p>
+<p><b>Câu 73.</b> Thực hiện chức năng <b>Cập nhật thông tin sinh viên (Update)</b> đối với sinh viên <code>SV001</code>. <i>(Gợi ý: Đổi tên thành <code>Nguyen Van A - Updated</code> → Nhấn <b>Lưu/Cập nhật</b>)</i></p>
+<p><b>Câu 74.</b> Kiểm tra dữ liệu biến động tương ứng trong MongoDB Atlas. <i>(Gợi ý: Nhấn Refresh trong MongoDB Atlas để xác nhận trường name đã đổi)</i></p>
+<p><b>Câu 75.</b> Thực hiện chức năng <b>Xóa sinh viên (Delete)</b> đối với sinh viên <code>SV003</code>. <i>(Gợi ý: Nhấn nút <b>Xóa</b> kế bên dòng sinh viên <code>SV003</code>)</i></p>
+<p><b>Câu 76.</b> Kiểm tra danh sách sinh viên trên Web sau khi xóa. <i>(Gợi ý: Xác nhận sinh viên <code>SV003</code> đã biến mất)</i></p>
+<p><b>Câu 77.</b> Mở tab <b>Logs</b> của Backend Service trên Render Dashboard đồng thời khi thao tác trên Web. <i>(Gợi ý: Quan sát các dòng log ghi lại Request HTTP <code>GET /api/students</code>, <code>POST /api/students</code>, <code>PUT /api/students/...</code>, <code>DELETE /api/students/...</code>)</i></p>
+<p><b>Câu 78.</b> Thực hành kiểm tra hiện tượng <b>Cold Start</b> của Render Free Tier bằng cách để ứng dụng không hoạt động trong 15 phút hoặc xem mô tả log. <i>(Gợi ý: Quan sát trạng thái container chuyển sang Sleep và thời gian khởi động lại khi có request mới)</i></p>
+<p><b>Câu 79.</b> Kiểm tra dung lượng RAM và CPU Usage của Backend và Frontend Container trên Render Dashboard. <i>(Gợi ý: Mở tab <b>Metrics</b> trên Render)</i></p>
+<p><b>Câu 80.</b> Chụp màn hình giao diện ứng dụng Web chạy trên Render kèm theo bảng điều khiển Render Dashboard để làm bằng chứng thực hành. <i>(Gợi ý: Chụp rõ thanh địa chỉ URL HTTPS)</i></p>
+<p><b>Mục tiêu phần này:</b> Sinh viên kiểm thử toàn bộ các chức năng CRUD của ứng dụng MERN trên hạ tầng Cloud PaaS thực tế và biết cách theo dõi logs/metrics hệ thống.</p>
+
+<h2>PHẦN 7. GIT VÀ TỔNG HỢP BÀI THỰC HÀNH BUỔI 5</h2>
+<p><b>Thời gian dự kiến: 20 phút</b></p>
+<p><b>Câu 81.</b> Mở Terminal tại thư mục dự án <code>cloud-lab</code> trên máy local. <i>(Gợi ý lệnh: <code>cd cloud-lab</code>)</i></p>
+<p><b>Câu 82.</b> Kiểm tra trạng thái các file đã chỉnh sửa sau Buổi 5. <i>(Gợi ý lệnh: <code>git status</code>)</i></p>
+<p><b>Câu 83.</b> Đảm bảo file <code>.env</code> chứa mật khẩu MongoDB Atlas <b>không nằm trong Staging Area</b>. <i>(Gợi ý: Kiểm tra file <code>.gitignore</code> đã có dòng <code>.env</code>)</i></p>
+<p><b>Câu 84.</b> Kiểm tra file <code>.env.example</code> đã lưu mẫu khai báo biến môi trường không chứa mật khẩu thật. <i>(Gợi ý: Kiểm tra <code>.env.example</code> chứa <code>MONGODB_URI=</code>, <code>PORT=</code>, <code>CLIENT_URL=</code>)</i></p>
+<p><b>Câu 85.</b> Đưa toàn bộ mã nguồn cập nhật vào Staging Area. <i>(Gợi ý lệnh: <code>git add .</code>)</i></p>
+<p><b>Câu 86.</b> Tạo commit cho kết quả thực hành Buổi 5. <i>(Gợi ý lệnh: <code>git commit -m "Complete Lab 05 MERN Cloud PaaS Render Deployment"</code>)</i></p>
+<p><b>Câu 87.</b> Push mã nguồn cập nhật lên GitHub Repository. <i>(Gợi ý lệnh: <code>git push origin main</code>)</i></p>
+<p><b>Câu 88.</b> Kiểm tra GitHub Repository trên trình duyệt để xác nhận commit mới đã tải lên thành công. <i>(Gợi ý: Kiểm tra thư mục <code>server</code>, <code>client</code> và các file cấu hình)</i></p>
+<p><b>Câu 89.</b> Tổng hợp danh sách 4 đường link nộp bài Buổi 5 vào file ghi chú:</p>
+<ol>
+    <li><b>GitHub Repo:</b> <code>https://github.com/&lt;username&gt;/cloud-lab</code></li>
+    <li><b>Docker Hub Backend:</b> <code>https://hub.docker.com/r/&lt;username&gt;/mern-backend</code></li>
+    <li><b>Render Backend URL:</b> <code>https://mern-backend-&lt;mssv&gt;.onrender.com</code></li>
+    <li><b>Render Frontend App URL:</b> <code>https://mern-frontend-&lt;mssv&gt;.onrender.com</code></li>
+</ol>
+<p><b>Câu 90.</b> Xác nhận hoàn thành toàn bộ bài thực hành Buổi 5 với môi trường Cloud PaaS hoàn toàn miễn phí, an toàn và ổn định. <i>(Gợi ý: Kiểm tra ứng dụng vẫn truy cập bình thường)</i></p>
+<p><b>Mục tiêu phần này:</b> Sinh viên hoàn tất việc đồng bộ mã nguồn lên GitHub và tổng hợp đầy đủ các sản phẩm thực hành Buổi 5.</p>
+
+<hr>
+
+<h1>BUỔI 6. QUẢN LÝ PRODUCTION: AUTOMATED DEPLOY (CI/CD), CUSTOM ROUTING, ROLLING UPDATES VÀ MONITORING</h1>
+
+<div class="info-box">
+    <p><b>Thời lượng:</b> 300 phút (5 giờ)</p>
+    <p><b>Môi trường:</b> Máy tính cá nhân, VS Code, Trình duyệt Web, Render Dashboard, Docker Hub</p>
+    <p><b>Ứng dụng:</b> Tiếp tục ứng dụng Quản lý sinh viên của Buổi 5</p>
+    <p><b>Database:</b> MongoDB Atlas Free Tier</p>
+    <p><b>Công nghệ:</b> Docker, Docker Hub, Render.com, Deploy Webhooks (CI/CD), API Rewrites / Reverse Proxy, Rolling Updates, SSL/HTTPS, Health Check & Monitoring, Git/GitHub</p>
+</div>
+
+<h2>Mục tiêu</h2>
+<p>Sau khi hoàn thành buổi thực hành, sinh viên có khả năng:</p>
+<ol>
+    <li>Hiểu khái niệm và tầm quan trọng của quy trình Tự động hóa Triển khai (Continuous Deployment - CD) trong phát triển phần mềm hiện đại.</li>
+    <li>Cấu hình <b>Deploy Webhooks</b> giữa Docker Hub Registry và Render.com Cloud PaaS.</li>
+    <li>Thực hành kịch bản Tự động Deploy (Auto-Deploy): Khi <code>docker push</code> Image mới lên Docker Hub, Cloud PaaS tự động cập nhật ứng dụng không cần thao tác tay.</li>
+    <li>Hiểu nguyên lý hoạt động của Reverse Proxy / API Rewrites trên Cloud PaaS để thống nhất Cổng truy cập (Unified Origin).</li>
+    <li>Cấu hình Redirect/Rewrite Rules để định tuyến các request <code>/api/*</code> từ Frontend sang Backend tự động.</li>
+    <li>Loại bỏ hoàn toàn việc hardcode URL Backend ở mã nguồn Frontend, tăng tính linh hoạt và bảo mật.</li>
+    <li>Thực hành quy trình cập nhật phiên bản ứng dụng không gián đoạn (Zero-Downtime Rolling Update).</li>
+    <li>Cấu hình bài kiểm tra sức khỏe ứng dụng (Health Check Endpoint) cho các Container trên Cloud.</li>
+    <li>Quản trị chứng chỉ SSL/TLS tự động và hiểu cơ chế bảo mật HTTPS trên Cloud PaaS.</li>
+    <li>Phân tích System Logs, theo dõi chỉ số hiệu năng (Metrics: CPU, RAM, Bandwidth) và chẩn đoán sự cố trên Production.</li>
+    <li>Đánh giá và tổng hợp toàn bộ chuỗi thực hành Điện toán đám mây từ Buổi 1 đến Buổi 6.</li>
+</ol>
+
+<h2>Kết quả cần đạt</h2>
+<p>Cuối buổi, sinh viên nâng cấp hệ thống MERN trên Cloud PaaS đạt chuẩn Production theo mô hình:</p>
+
+<div class="diagram">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Quy trình CI/CD Tự động:<br>
+Developer (Local) ────► docker push ────► Docker Hub Registry ────► Deploy Webhook ────► Auto-Redeploy Render<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mô hình Vận hành Production:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Trình duyệt Người dùng (Client Browser)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│ (HTTPS Port 443 - Standard SSL)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Render Unified Domain Service<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(https://mern-app-&lt;mssv&gt;.onrender.com)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;┌────────────────────┴────────────────────┐<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│ Rewrites / Internal Reverse Proxy&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+   Frontend Service (React)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Backend Service (Node.js)<br>
+   (Static Assets / Client Routes)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(/api/* -> Express Routes)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MongoDB Atlas Database
+</div>
+
+<h2>PHẦN 1. ÔN TẬP VÀ KIỂM TRA HỆ THỐNG MERN TRÊN CLOUD PAAS TỪ BUỔI 5</h2>
+<p><b>Thời gian dự kiến: 25 phút</b></p>
+<p><b>Câu 1.</b> Mở trình duyệt web và truy cập Render Dashboard tại <code>https://dashboard.render.com</code>. <i>(Gợi ý: Đăng nhập bằng tài khoản GitHub)</i></p>
+<p><b>Câu 2.</b> Kiểm tra trạng thái hoạt động của 2 Web Service đã tạo ở Buổi 5: <code>mern-backend-&lt;mssv&gt;</code> và <code>mern-frontend-&lt;mssv&gt;</code>. <i>(Gợi ý: Xác nhận cả 2 Service đều ở trạng thái <b>Live</b>)</i></p>
+<p><b>Câu 3.</b> Truy cập ứng dụng Frontend qua Public URL (<code>https://mern-frontend-&lt;mssv&gt;.onrender.com</code>). <i>(Gợi ý: Kiểm tra giao diện hiển thị danh sách sinh viên từ MongoDB Atlas)</i></p>
+<p><b>Câu 4.</b> Mở tab <b>Logs</b> của Backend Service trên Render để kiểm tra nhật ký kết nối. <i>(Gợi ý: Xác nhận kết nối MongoDB Atlas vẫn duy trì ổn định)</i></p>
+<p><b>Câu 5.</b> Mở Terminal trên máy local, di chuyển vào thư mục dự án <code>cloud-lab</code>. <i>(Gợi ý lệnh: <code>cd cloud-lab</code>)</i></p>
+<p><b>Câu 6.</b> Kiểm tra branch Git hiện tại và cập nhật code mới nhất từ GitHub nếu có. <i>(Gợi ý lệnh: <code>git pull origin main</code>)</i></p>
+<p><b>Câu 7.</b> Kiểm tra phiên bản Docker và đăng nhập lại Docker Hub trên máy local. <i>(Gợi ý lệnh: <code>docker login</code>)</i></p>
+<p><b>Câu 8.</b> Kiểm tra các Docker Image hiện có trên máy local. <i>(Gợi ý lệnh: <code>docker images</code>)</i></p>
+<p><b>Câu 9.</b> Kiểm tra 2 Repository <code>mern-backend</code> và <code>mern-frontend</code> trên Docker Hub Dashboard. <i>(Gợi ý: Xác nhận các Tag <code>1.0</code>, <code>1.1</code>, <code>2.0</code> đã lưu đầy đủ)</i></p>
+<p><b>Câu 10.</b> Xác định mục tiêu nâng cấp của Buổi 6: Tự động hóa triển khai (CD), thống nhất Domain qua API Rewrites, Rolling Update và Monitoring. <i>(Gợi ý: Nắm rõ lộ trình thực hành 300 phút)</i></p>
+<p><b>Mục tiêu phần này:</b> Sinh viên kiểm tra và đảm bảo toàn bộ hạ tầng Cloud PaaS và Docker Registry từ Buổi 5 sẵn sàng cho các bài thực hành nâng cao ở Buổi 6.</p>
+
+<h2>PHẦN 2. CẤU HÌNH TỰ ĐỘNG HÓA TRIỂN KHAI (CI/CD) QUA DOCKER HUB WEBHOOKS</h2>
+<p><b>Thời gian dự kiến: 60 phút</b></p>
+<p><b>Câu 11.</b> Hiểu khái niệm Webhook và cơ chế Tự động Deploy (Continuous Deployment). <i>(Gợi ý: Webhook là cơ chế HTTP callback giúp Docker Hub tự động bắn thông báo sang Render mỗi khi có Image mới được push)</i></p>
+<p><b>Câu 12.</b> Truy cập Render Dashboard → Chọn Web Service Backend <code>mern-backend-&lt;mssv&gt;</code>. <i>(Gợi ý: Chọn mục <b>Settings</b> ở menu bên trái)</i></p>
+<p><b>Câu 13.</b> Cuộn xuống tìm mục <b>Deploy Hook</b>. <i>(Gợi ý: Render cung cấp sẵn một đường link URL đặc biệt dành riêng cho việc trigger deploy)</i></p>
+<p><b>Câu 14.</b> Sao chép đường link <b>Deploy Hook URL</b> của Backend Service. <i>(Gợi ý: Đường link dạng <code>https://api.render.com/deploy/srv-xxxxx?key=yyyyy</code>)</i></p>
+<p><b>Câu 15.</b> Mở tab mới trên trình duyệt, truy cập Docker Hub (<code>https://hub.docker.com</code>) → Mở Repository <code>mern-backend</code>. <i>(Gợi ý: Chọn tab <b>Webhooks</b>)</i></p>
+<p><b>Câu 16.</b> Tạo một Webhook mới trên Docker Hub cho Backend. <i>(Gợi ý: Nhập <b>Webhook name</b>: <code>Render Auto Deploy Backend</code>)</i></p>
+<p><b>Câu 17.</b> Dán đường link <b>Deploy Hook URL</b> đã sao chép từ Render vào ô <b>Webhook URL</b> trên Docker Hub → Nhấn <b>Save</b>. <i>(Gợi ý: Docker Hub sẽ lưu Webhook cấu hình)</i></p>
+<p><b>Câu 18.</b> Quay lại Render Dashboard → Chọn Web Service Frontend <code>mern-frontend-&lt;mssv&gt;</code> → Vào <b>Settings</b> → Sao chép <b>Deploy Hook URL</b> của Frontend. <i>(Gợi ý: Lấy Deploy Hook URL riêng của Frontend)</i></p>
+<p><b>Câu 19.</b> Truy cập Docker Hub Repository <code>mern-frontend</code> → Chọn tab <b>Webhooks</b> → Tạo Webhook tên <code>Render Auto Deploy Frontend</code> và dán Deploy Hook URL tương ứng. <i>(Gợi ý: Nhấn <b>Save</b>)</i></p>
+<p><b>Câu 20.</b> Tiến hành thực nghiệm tính năng Auto-Deploy: Mở VS Code trên máy local, chỉnh sửa nhẹ thông báo log trong file <code>server/server.js</code>. <i>(Gợi ý: Thay đổi dòng console.log chào mừng khi khởi động server)</i></p>
+<p><b>Câu 21.</b> Mở Terminal local, di chuyển vào thư mục <code>server</code> và build Docker Image Backend phiên bản <code>1.2</code>. <i>(Gợi ý lệnh: <code>docker build -t &lt;dockerhub-username&gt;/mern-backend:1.2 ./server</code>)</i></p>
+<p><b>Câu 22.</b> Gắn thêm tag <code>:latest</code> cho Image Backend vừa build. <i>(Gợi ý lệnh: <code>docker tag &lt;dockerhub-username&gt;/mern-backend:1.2 &lt;dockerhub-username&gt;/mern-backend:latest</code>)</i></p>
+<p><b>Câu 23.</b> Thực hiện <code>docker push</code> phiên bản <code>:latest</code> lên Docker Hub. <i>(Gợi ý lệnh: <code>docker push &lt;dockerhub-username&gt;/mern-backend:latest</code>)</i></p>
+<p><b>Câu 24.</b> Ngay sau khi lệnh push hoàn tất, chuyển sang tab <b>Webhooks</b> trên Docker Hub để kiểm tra lịch sử gọi Webhook. <i>(Gợi ý: Quan sát mục <b>View History</b>, xác nhận trạng thái gửi HTTP POST thành công <code>200 OK</code>)</i></p>
+<p><b>Câu 25.</b> Chuyển sang Render Dashboard → Mở Web Service Backend <code>mern-backend-&lt;mssv&gt;</code> → Mở tab <b>Events</b> hoặc <b>Logs</b>. <i>(Gợi ý: Quan sát Render tự động kích hoạt tiến trình <code>Deploying image...</code> mà không cần người dùng nhấn nút tay)</i></p>
+<p><b>Câu 26.</b> Kiểm tra kết quả tự động triển khai thành công trên Render. <i>(Gợi ý: Xác nhận log hiển thị dòng chào mừng mới đã được cập nhật trên Cloud)</i></p>
+<p><b>Mục tiêu phần này:</b> Sinh viên thiết lập thành công quy trình Tự động hóa Triển khai (CD) giữa Docker Hub Registry và Cloud PaaS Render thông qua Webhook.</p>
+
+<h2>PHẦN 3. CẤU HÌNH REVERSE PROXY / API REWRITES VÀ THỐNG NHẤT DOMAIN</h2>
+<p><b>Thời gian dự kiến: 60 phút</b></p>
+<p><b>Câu 27.</b> Phân tích hạn chế của mô hình Buổi 5: Frontend và Backend dùng 2 Domain riêng biệt làm phát sinh lỗi CORS và phức tạp khi quản lý môi trường. <i>(Gợi ý: Cần cấu hình thống nhất về 1 Domain duy nhất)</i></p>
+<p><b>Câu 28.</b> Hiểu giải pháp API Rewrites / Reverse Proxy trên Cloud PaaS: Mọi request gửi tới Domain Frontend dạng <code>https://mern-frontend-&lt;mssv&gt;.onrender.com/api/*</code> sẽ được Cloud PaaS tự động chuyển tiếp ngầm tới Backend Service. <i>(Gợi ý: Người dùng chỉ cần nhớ 1 URL duy nhất)</i></p>
+<p><b>Câu 29.</b> Truy cập Render Dashboard → Chọn Web Service Frontend <code>mern-frontend-&lt;mssv&gt;</code>. <i>(Gợi ý: Chọn mục <b>Redirects/Rewrites</b> ở menu bên trái)</i></p>
+<p><b>Câu 30.</b> Tạo một Quy tắc Chuyển tiếp (Rewrite Rule) mới. <i>(Gợi ý: Nhấn <b>Add Rule</b> hoặc <b>Add Rewrite</b>)</i></p>
+<p><b>Câu 31.</b> Cấu hình thông số cho Rewrite Rule:</p>
+<ul>
+    <li><b>Type:</b> Chọn <code>Rewrite</code> (Chuyển tiếp ngầm, không đổi URL trên thanh địa chỉ trình duyệt)</li>
+    <li><b>Source Path:</b> Nhập <code>/api/*</code></li>
+    <li><b>Destination Path:</b> Nhập <code>https://mern-backend-&lt;mssv&gt;.onrender.com/api/*</code> (URL của Backend Service)</li>
+</ul>
+<p><b>Câu 32.</b> Nhấn <b>Save Changes</b> để lưu quy tắc Rewrite trên Frontend Service. <i>(Gợi ý: Render sẽ cập nhật cấu hình Router cho Frontend)</i></p>
+<p><b>Câu 33.</b> Mở VS Code trên máy local, chỉnh sửa file <code>client/src/App.jsx</code> (hoặc nơi gọi API trong React). <i>(Gợi ý: Thay đổi URL gọi API từ <code>https://mern-backend...</code> thành đường dẫn tương đối <code>/api/students</code>)</i></p>
+<p><b>Câu 34.</b> Phân tích ưu điểm của đường dẫn tương đối <code>/api/students</code>: Code Frontend hoạt động hoàn hảo trên mọi môi trường (Local, Staging, Cloud Production) mà không cần đổi URL hardcode. <i>(Gợi ý: Hiểu rõ tư duy thiết kế phần mềm linh hoạt)</i></p>
+<p><b>Câu 35.</b> Mở Terminal local, di chuyển vào thư mục <code>client</code> và build Docker Image Frontend phiên bản <code>3.0</code>. <i>(Gợi ý lệnh: <code>docker build -t &lt;dockerhub-username&gt;/mern-frontend:3.0 ./client</code>)</i></p>
+<p><b>Câu 36.</b> Gắn tag <code>:latest</code> cho Frontend Image phiên bản <code>3.0</code>. <i>(Gợi ý lệnh: <code>docker tag &lt;dockerhub-username&gt;/mern-frontend:3.0 &lt;dockerhub-username&gt;/mern-frontend:latest</code>)</i></p>
+<p><b>Câu 37.</b> Push Frontend Image <code>:latest</code> lên Docker Hub. <i>(Gợi ý lệnh: <code>docker push &lt;dockerhub-username&gt;/mern-frontend:latest</code>)</i></p>
+<p><b>Câu 38.</b> Quan sát Docker Hub tự động kích hoạt Webhook và Render tự động redeploy Frontend Container. <i>(Gợi ý: Kiểm tra tab <b>Logs</b> trên Render Frontend Service)</i></p>
+<p><b>Câu 39.</b> Mở trình duyệt web, truy cập duy nhất URL của Frontend: <code>https://mern-frontend-&lt;mssv&gt;.onrender.com</code>. <i>(Gợi ý: Mở F12 -> Tab <b>Network</b>)</i></p>
+<p><b>Câu 40.</b> Thử tải lại danh sách sinh viên và kiểm tra các Request API trong tab Network. <i>(Gợi ý: Quan sát Request URL hiển thị dạng <code>https://mern-frontend-&lt;mssv&gt;.onrender.com/api/students</code> trả về Status <code>200 OK</code>)</i></p>
+<p><b>Câu 41.</b> Xác nhận trình duyệt không còn phải gọi trực tiếp sang Domain Backend và không còn bất kỳ lỗi CORS nào. <i>(Gợi ý: Mô hình Unified Origin đã hoạt động hoàn hảo)</i></p>
+<p><b>Câu 42.</b> Chụp màn hình tab Network hiển thị các request <code>/api/students</code> chạy thành công qua Domain Frontend làm bằng chứng thực hành. <i>(Gợi ý: Lưu ảnh làm báo cáo)</i></p>
+<p><b>Mục tiêu phần này:</b> Sinh viên triển khai thành công mô hình API Rewrites/Reverse Proxy trên Cloud PaaS, thống nhất điểm truy cập ứng dụng về một Domain duy nhất.</p>
+
+<h2>PHẦN 4. THỰC HÀNH NÂNG CẤP PHIÊN BẢN 2.0 VÀ ROLLING UPDATES KHÔNG GIÁN ĐOẠN</h2>
+<p><b>Thời gian dự kiến: 50 phút</b></p>
+<p><b>Câu 43.</b> Hiểu khái niệm <b>Rolling Update (Cập nhật cuốn chiếu / Không gián đoạn)</b> trên Cloud PaaS. <i>(Gợi ý: PaaS sẽ khởi tạo Container mới, kiểm tra sức khỏe thành công rồi mới điều hướng traffic và tắt Container cũ)</i></p>
+<p><b>Câu 44.</b> Tạo một API Endpoint kiểm tra sức khỏe (Health Check) trong Backend. Mở file <code>server/server.js</code> trên VS Code và thêm đoạn code: <i>(Gợi ý thêm code:)</i></p>
+
+<pre>// Health Check Endpoint cho Cloud PaaS Monitoring
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'UP',
+    timestamp: new Date(),
+    uptime: process.uptime()
+  });
+});</pre>
+
+<p><b>Câu 45.</b> Tạo giao diện hiển thị phiên bản ứng dụng v2.0 trên React Frontend. Mở <code>client/src/App.jsx</code> và thêm Header/Footer hiển thị: <code>Phiên bản 2.0 - Production Cloud PaaS (Auto-Deployed)</code>. <i>(Gợi ý: Chỉnh sửa UI giao diện)</i></p>
+<p><b>Câu 46.</b> Mở Terminal local, build Image Backend <code>2.0</code> và Image Frontend <code>2.0</code>. <i>(Gợi ý lệnh: <code>docker build -t &lt;username&gt;/mern-backend:2.0 ./server</code> và <code>docker build -t &lt;username&gt;/mern-frontend:2.0 ./client</code>)</i></p>
+<p><b>Câu 47.</b> Gắn tag <code>:latest</code> cho cả 2 Image phiên bản <code>2.0</code>. <i>(Gợi ý lệnh: <code>docker tag ...:2.0 ...:latest</code>)</i></p>
+<p><b>Câu 48.</b> Push đồng thời cả 2 Image <code>:latest</code> lên Docker Hub. <i>(Gợi ý lệnh: <code>docker push &lt;username&gt;/mern-backend:latest</code> và <code>docker push &lt;username&gt;/mern-frontend:latest</code>)</i></p>
+<p><b>Câu 49.</b> Mở Render Dashboard → Mở Web Service Backend <code>mern-backend-&lt;mssv&gt;</code> → Vào <b>Settings</b> → Cấu hình <b>Health Check Path</b>. <i>(Gợi ý: Nhập <code>/health</code> vào ô <b>Health Check Path</b>)</i></p>
+<p><b>Câu 50.</b> Quan sát Render nhận được Webhook và bắt đầu quy trình <b>Rolling Update</b>. <i>(Gợi ý: Mở tab <b>Logs</b> của Backend Service)</i></p>
+<p><b>Câu 51.</b> Theo dõi tiến trình Rolling Update trong logs: Render tải Container mới, gửi HTTP GET tới <code>/health</code>, khi nhận phản hồi <code>200 OK</code> mới chuyển traffic sang Container mới. <i>(Gợi ý: Quan sát dòng log <code>Health check passed. Swapping instances...</code>)</i></p>
+<p><b>Câu 52.</b> Mở liên tục đường link ứng dụng <code>https://mern-frontend-&lt;mssv&gt;.onrender.com</code> trên trình duyệt trong lúc hệ thống đang redeploy. <i>(Gợi ý: Xác nhận ứng dụng không bị gián đoạn hay báo lỗi ngắt kết nối)</i></p>
+<p><b>Câu 53.</b> Kiểm tra giao diện ứng dụng sau khi quá trình Rolling Update hoàn tất. <i>(Gợi ý: Bảng tiêu đề đã cập nhật thông báo <code>Phiên bản 2.0 - Production Cloud PaaS</code>)</i></p>
+<p><b>Câu 54.</b> Kiểm tra endpoint <code>/health</code> trực tiếp trên trình duyệt. <i>(Gợi ý: Truy cập <code>https://mern-frontend-&lt;mssv&gt;.onrender.com/api/health</code> hoặc qua Backend URL, xác nhận JSON trả về status <code>UP</code>)</i></p>
+<p><b>Câu 55.</b> Thực hiện thử một thao tác Thêm sinh viên trên giao diện v2.0 mới. <i>(Gợi ý: Nhập dữ liệu sinh viên mới để xác nhận kết nối Database Atlas vẫn nguyên vẹn)</i></p>
+<p><b>Câu 56.</b> Kiểm tra dữ liệu vừa thêm trong MongoDB Atlas Dashboard. <i>(Gợi ý: Xác nhận Document mới đã lưu thành công)</i></p>
+<p><b>Câu 57.</b> Phân tích ưu điểm của Health Check kết hợp Rolling Update trong quản trị hệ thống Cloud. <i>(Gợi ý: Giúp phát hiện container lỗi trước khi public cho người dùng, đảm bảo High Availability)</i></p>
+<p><b>Câu 58.</b> Chụp màn hình thông tin Health Check thành công và phiên bản v2.0 trên Cloud làm bằng chứng bài tập. <i>(Gợi ý: Lưu ảnh vào thư mục báo cáo)</i></p>
+<p><b>Mục tiêu phần này:</b> Sinh viên làm chủ kỹ thuật Rolling Update không gián đoạn dịch vụ và cấu hình Health Check Path trên Cloud PaaS.</p>
+
+<h2>PHẦN 5. BẢO MẬT CLOUD, CHỨNG CHỈ SSL/HTTPS VÀ CUSTOM SUBDOMAIN</h2>
+<p><b>Thời gian dự kiến: 40 phút</b></p>
+<p><b>Câu 59.</b> Tìm hiểu về chứng chỉ <b>SSL/TLS miễn phí (Let's Encrypt)</b> tự động tích hợp trên Cloud PaaS Render. <i>(Gợi ý: Mọi dịch vụ tạo trên Render mặc định đều được cấp chứng chỉ SSL và tự động gia hạn)</i></p>
+<p><b>Câu 60.</b> Kiểm tra thông tin chứng chỉ SSL của trang web trên trình duyệt. <i>(Gợi ý: Nhấp vào biểu tượng <b>Ổ khóa (Padlock)</b> bên trái thanh địa chỉ URL → Chọn <b>Connection is secure</b> → <b>Certificate is valid</b>)</i></p>
+<p><b>Câu 61.</b> Kiểm tra các thông số của Chứng chỉ SSL. <i>(Gợi ý: Quan sát tổ chức cấp phát <b>Let's Encrypt</b>, thời hạn hiệu lực và thuật toán mã hóa TLS 1.3)</i></p>
+<p><b>Câu 62.</b> Thử truy cập ứng dụng bằng giao thức HTTP không bảo mật: <code>http://mern-frontend-&lt;mssv&gt;.onrender.com</code>. <i>(Gợi ý: Quan sát Render tự động chuyến hướng (HTTP 301 Redirect) sang giao thức HTTPS an toàn)</i></p>
+<p><b>Câu 63.</b> Tìm hiểu về cơ chế <b>HSTS (HTTP Strict Transport Security)</b> được bật mặc định trên Cloud PaaS. <i>(Gợi ý: HSTS bắt buộc trình duyệt luôn giao tiếp bằng HTTPS để chống tấn công Man-in-the-Middle)</i></p>
+<p><b>Câu 64.</b> Mở Render Dashboard → Vào Web Service Frontend → Chọn mục <b>Custom Domains</b>. <i>(Gợi ý: Quan sát nơi cho phép gắn Tên miền riêng nếu có)</i></p>
+<p><b>Câu 65.</b> Tìm hiểu quy trình cấu hình Custom Domain trên Cloud PaaS (nếu sinh viên có tên miền cá nhân). <i>(Gợi ý: Cấu hình bản ghi CNAME trỏ về <code>onrender.com</code> và Render tự động sinh SSL cho Custom Domain)</i></p>
+<p><b>Câu 66.</b> Kiểm tra tính năng <b>Environment Secrets / Environment Groups</b> trên Render Dashboard. <i>(Gợi ý: Chọn <b>Environment</b> ở menu chính Dashboard)</i></p>
+<p><b>Câu 67.</b> Tạo một <b>Environment Group</b> chung tên <code>MERN-Production-Secrets</code> để quản lý tập trung các biến môi trường dùng chung cho cả Frontend và Backend. <i>(Gợi ý: Nhấn <b>Create Environment Group</b>)</i></p>
+<p><b>Câu 68.</b> Đưa các biến môi trường nhạy cảm như <code>MONGODB_URI</code> vào Environment Group vừa tạo. <i>(Gợi ý: Giúp quản lý tập trung mã mật khẩu mà không cần gõ lại ở từng Service riêng lẻ)</i></p>
+<p><b>Câu 69.</b> Liên kết Web Service Backend với Environment Group <code>MERN-Production-Secrets</code>. <i>(Gợi ý: Chọn <b>Link Environment Group</b> trong cài đặt Backend)</i></p>
+<p><b>Câu 70.</b> Kiểm tra sự hoạt động ổn định của ứng dụng sau khi nhóm các biến môi trường bảo mật. <i>(Gợi ý: Tải lại trang web và kiểm tra các tính năng CRUD)</i></p>
+<p><b>Mục tiêu phần này:</b> Sinh viên nắm vững các cơ chế bảo mật Cloud mặc định (SSL/HTTPS, Automatic Redirect, HSTS) và quản lý bí mật môi trường tập trung bằng Environment Groups.</p>
+
+<h2>PHẦN 6. PHÂN TÍCH LOG, GIÁM SÁT METRICS VÀ TROUBLESHOOTING TRÊN CLOUD</h2>
+<p><b>Thời gian dự kiến: 45 phút</b></p>
+<p><b>Câu 71.</b> Hiểu tầm quan trọng của việc Giám sát (Monitoring) và Phân tích nhật ký (Log Analysis) trong quản trị Cloud Production. <i>(Gợi ý: Giúp phát hiện sớm nghẽn bộ nhớ, lỗi 500 API hoặc tấn công vô hiệu hóa dịch vụ)</i></p>
+<p><b>Câu 72.</b> Truy cập Render Dashboard → Mở Web Service Backend <code>mern-backend-&lt;mssv&gt;</code> → Chọn mục <b>Logs</b>. <i>(Gợi ý: Quan sát dòng log chảy theo thời gian thực - Real-time Logs)</i></p>
+<p><b>Câu 73.</b> Sử dụng ô tìm kiếm/lọc (Search Logs) để lọc ra các log lỗi. <i>(Gợi ý: Nhập từ khóa <code>error</code>, <code>failed</code>, <code>500</code> hoặc <code>mongoose</code> vào ô search)</i></p>
+<p><b>Câu 74.</b> Thực hiện tạo một lỗi giả định để thực hành chẩn đoán: Nhập sai tham số trên URL API hoặc gửi dữ liệu thiếu trong Form Thêm sinh viên. <i>(Gợi ý: Quan sát log Backend ghi nhận lỗi validation hoặc lỗi 400/500)</i></p>
+<p><b>Câu 75.</b> Mở mục <b>Metrics</b> trên Web Service Backend của Render Dashboard. <i>(Gợi ý: Quan sát các biểu đồ giám sát tài nguyên)</i></p>
+<p><b>Câu 76.</b> Phân tích biểu đồ <b>CPU Usage</b>. <i>(Gợi ý: Theo dõi tỷ lệ phần trăm CPU mà Backend Container đang tiêu thụ)</i></p>
+<p><b>Câu 77.</b> Phân tích biểu đồ <b>Memory Usage (RAM)</b>. <i>(Gợi ý: Kiểm tra mức sử dụng RAM so với hạn mức 512MB của gói Free Tier)</i></p>
+<p><b>Câu 78.</b> Phân tích biểu đồ <b>Bandwidth / Network Traffic</b>. <i>(Gợi ý: Quan sát lưu lượng dữ liệu truyền nhận qua giao diện mạng)</i></p>
+<p><b>Câu 79.</b> Mở mục <b>Metrics</b> trên Web Service Frontend và so sánh mức tiêu thụ tài nguyên giữa Frontend và Backend Container. <i>(Gợi ý: Rút ra nhận xét về đặc thụ tải của Node.js Backend vs Static React Frontend)</i></p>
+<p><b>Câu 80.</b> Thực hành quy trình Khôi phục sự cố (Troubleshooting Step-by-Step):</p>
+<ol>
+    <li><b>Kiểm tra trạng thái Container:</b> Xác nhận Service báo Live hay Suspended.</li>
+    <li><b>Kiểm tra System Logs:</b> Tìm các lỗi unhandled exception hoặc crash log.</li>
+    <li><b>Kiểm tra Kết nối Database:</b> Kiểm tra IP Access List trên MongoDB Atlas.</li>
+    <li><b>Kiểm tra Biến môi trường:</b> Mở tab Environment xác minh <code>MONGODB_URI</code> và <code>CLIENT_URL</code>.</li>
+    <li><b>Thực hiện Manual Rollback/Redeploy:</b> Nhấn <b>Clear build cache & deploy</b> nếu bị lỗi cache Docker Image.</li>
+</ol>
+<p><b>Câu 81.</b> Thực hành thao tác <b>Manual Redeploy với Clear Build Cache</b>. <i>(Gợi ý: Chọn <b>Manual Deploy</b> → <b>Clear build cache & deploy</b> trên Render Dashboard)</i></p>
+<p><b>Câu 82.</b> Quan sát tiến trình Render xóa sạch cache cũ, kéo Image mới nhất từ Docker Hub và khởi chạy lại Container hoàn toàn sạch. <i>(Gợi ý: Theo dõi log tiến trình)</i></p>
+<p><b>Câu 83.</b> Kiểm tra ứng dụng sau khi Redeploy với Clear Cache. <i>(Gợi ý: Đảm bảo mọi tính năng CRUD sinh viên hoạt động mượt mà)</i></p>
+<p><b>Câu 84.</b> Xuất hoặc chụp màn hình biểu đồ Metrics (CPU/RAM Usage) và nhật ký Logs sạch của hệ thống. <i>(Gợi ý: Lưu làm tài liệu báo cáo)</i></p>
+<p><b>Câu 85.</b> Tổng kết các bài học kinh nghiệm về vận hành và xử lý sự cố ứng dụng Container trên Cloud PaaS. <i>(Gợi ý: Ghi chép các lỗi thường gặp và cách khắc phục)</i></p>
+<p><b>Mục tiêu phần này:</b> Sinh viên thạo kỹ năng quan sát log thời gian thực, đọc chỉ số tài nguyên hệ thống và xử lý các sự cố vận hành ứng dụng MERN trên Cloud.</p>
+
+<h2>PHẦN 7. BÀI TẬP TỔNG HỢP TOÀN KHÓA VÀ NỘP BÀI THỰC HÀNH</h2>
+<p><b>Thời gian dự kiến: 20 phút</b></p>
+<p><b>Câu 86.</b> Kiểm tra lại toàn bộ quy trình vận hành ứng dụng MERN Multi-Container trên Cloud PaaS từ đầu đến cuối (End-to-End Test). <i>(Gợi ý: Kiểm tra từ GitHub → Docker Hub → Render PaaS → MongoDB Atlas)</i></p>
+<p><b>Câu 87.</b> Mở ứng dụng trên trình duyệt qua URL duy nhất: <code>https://mern-frontend-&lt;mssv&gt;.onrender.com</code>. <i>(Gợi ý: Đảm bảo giao diện v2.0 tải nhanh, đẹp và có HTTPS an toàn)</i></p>
+<p><b>Câu 88.</b> Thực hiện kiểm thử toàn bộ chuỗi chức năng CRUD sinh viên trên môi trường Production:</p>
+<ul>
+    <li><b>Thêm sinh viên mới:</b> <code>SV999</code> - <code>Sinh Vien Tong Hop</code> - <code>tonghop@cloud.edu.vn</code>.</li>
+    <li><b>Xem danh sách:</b> Xác nhận sinh viên <code>SV999</code> xuất hiện tức thì.</li>
+    <li><b>Cập nhật:</b> Đổi email thành <code>tonghop.updated@cloud.edu.vn</code>.</li>
+    <li><b>Xóa:</b> Xóa sinh viên thử nghiệm <code>SV999</code>.</li>
+</ul>
+<p><b>Câu 89.</b> Kiểm tra MongoDB Atlas Dashboard để xác nhận dữ liệu trong collection <code>students</code> đã được đồng bộ chính xác. <i>(Gợi ý: Mở <b>Browse Collections</b> trên MongoDB Atlas)</i></p>
+<p><b>Câu 90.</b> Mở Terminal local, kiểm tra trạng thái Git và thực hiện commit tổng kết toàn bộ chuỗi thực hành 6 buổi. <i>(Gợi ý lệnh: <code>git add .</code> và <code>git commit -m "Final Complete Cloud Computing Lab 01-06 MERN Stack Production"</code>)</i></p>
+<p><b>Câu 91.</b> Push commit cuối cùng lên GitHub Repository. <i>(Gợi ý lệnh: <code>git push origin main</code>)</i></p>
+<p><b>Câu 92.</b> Điền đầy đủ thông tin vào <b>Biểu mẫu Báo cáo Thực hành Tổng hợp</b> theo mẫu chuẩn sau:</p>
+
+<pre>====================================================================
+BÁO CÁO KẾT QUẢ THỰC HÀNH MÔN ĐIỆN TOÁN ĐÁM MÂY (LAB 01 - LAB 06)
+====================================================================
+1. Họ và tên Sinh viên: ............................................
+2. Mã số Sinh viên (MSSV): .........................................
+3. Lớp / Nhóm thực hành: ...........................................
+--------------------------------------------------------------------
+DANH SÁCH ĐƯỜNG LINK BẰNG CHỨNG SẢN PHẨM:
+- Link GitHub Repository (Buổi 1 - 6):
+  https://github.com/&lt;github-username&gt;/cloud-lab
+
+- Link Docker Hub Backend Repository (Buổi 4 - 6):
+  https://hub.docker.com/r/&lt;dockerhub-username&gt;/mern-backend
+
+- Link Docker Hub Frontend Repository (Buổi 4 - 6):
+  https://hub.docker.com/r/&lt;dockerhub-username&gt;/mern-frontend
+
+- Link Cloud PaaS Production App (Buổi 5 - 6):
+  https://mern-frontend-&lt;mssv&gt;.onrender.com
+
+- Link Cloud PaaS Backend API Endpoint (Buổi 5 - 6):
+  https://mern-frontend-&lt;mssv&gt;.onrender.com/api/students
+--------------------------------------------------------------------
+XÁC NHẬN KẾT QUẢ HỆ THỐNG:
+[X] Ứng dụng triển khai thành công 100% trên Cloud PaaS Render.com.
+[X] Đã cấu hình SSL/HTTPS và Reverse Proxy API Rewrites.
+[X] Đã cấu hình Auto-Deploy CI/CD qua Docker Hub Webhooks.
+[X] Đã kết nối Cloud Database MongoDB Atlas an toàn bằng Environment Variables.
+[X] Không phát sinh bất kỳ chi phí hay yêu cầu thẻ tín dụng nào.
+====================================================================</pre>
+
+<p><b>Câu 93.</b> Kiểm tra lại tính truy cập công khai (Public Access) của tất cả các đường link trong báo cáo. <i>(Gợi ý: Mở tab Ẩn danh (Incognito Window) trên trình duyệt để kiểm tra xem giảng viên có thể mở được tất cả các link mà không cần đăng nhập không)</i></p>
+<p><b>Câu 94.</b> Lưu file Báo cáo tổng hợp vào thư mục dự án và nộp lên hệ thống quản lý học tập (LMS/Google Classroom) theo quy định của giảng viên. <i>(Gợi ý: Lưu file dạng <code>BAOCAO_CLOUD_LAB_&lt;MSSV&gt;.txt</code> hoặc <code>.md</code>)</i></p>
+<p><b>Câu 95.</b> Tuyên bố hoàn thành xuất sắc chuỗi bài tập thực hành môn Điện toán đám mây với đầy đủ kiến thức về Linux, MERN Stack, Docker, Container Orchestration, Cloud Registry, Cloud PaaS, CI/CD và Cloud Security! <i>(Gợi ý: Chúc mừng sinh viên đã hoàn thành khóa học!)</i></p>
+<p><b>Mục tiêu phần này:</b> Sinh viên tổng hợp đầy đủ hồ sơ sản phẩm, kiểm thử lần cuối và nộp bài báo cáo tổng hợp toàn khóa thực hành Điện toán đám mây.</p>
+
+</body>
+</html>
+```eof
+
+I have generated the file for you. 
+
+### How to use/save as Word document (.docx):
+1. Locate the file `Thuc_Hanh_Buoi_5_6_Render_MERN.html` in the workspace editor panel.
+2. Download or save it to your local machine.
+3. Open Microsoft Word, go to **File > Open**, select **All Files (*.*)**, and choose `Thuc_Hanh_Buoi_5_6_Render_MERN.html`.
+4. Once loaded in Word, go to **File > Save As** and choose **Word Document (*.docx)**.
+
+Alternatively, double-clicking or renaming the file extension from `.html` to `.doc` will directly open it with Microsoft Word with proper typography, headings, code formatting, and structure intact.
