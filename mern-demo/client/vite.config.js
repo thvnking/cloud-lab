@@ -1,10 +1,10 @@
-import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
   preview: {
-    allowedHosts: ['mern-frontend-235985.onrender.com'],
-  },
+    host: '0.0.0.0',
+    allowedHosts: ['mern-frontend-235985.onrender.com']
+  }
 })
